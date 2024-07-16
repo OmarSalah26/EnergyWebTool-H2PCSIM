@@ -1,0 +1,14 @@
+WATER_PLANTS,water_tech,water_plants_zone,water_plants_capacity,water_plants_variable_om,Latitude,Longitude
+Blackstock_Well,Well,L0BNorth,41.42,0.51,.,.
+Orono_Wells,Well,L0BSouth,72.71,0.51,43.97972,-78.61722
+Bowmanville_WSP,WSP,L1C,1515.33,0.51,.,.
+Newcastle_WSP,WSP,L1B,340.54,0.51,.,.
+Beaverton_WSP,WSP,L0K,304.17,0.975,.,.
+Oshawa_WSP,WSP,Oshawa,5583.33,0.355,43.901986,-78.837007
+Whitby_WSP,WSP,Whitby,4916.67,0.355,43.897545,-78.942932
+Sunderland_Wells,Well,L0CNorth,57,0.975,44.2167,-79.0667
+Greenbank_Wells,Well,L0CSouth,23.04,0.975,.,.
+Ajax_WSP,WSP,Ajax_Pickering,6813,0.355,43.8452,-79.0042
+Cannington_Wells,Well,L0E,77.63,0.975,.,.
+Port_Perry_Wells,Well,L9L,490.88,0.975,44.110115,-78.937143
+Uxbridge_Wells,Well,L9P,507.58,0.975,.,.

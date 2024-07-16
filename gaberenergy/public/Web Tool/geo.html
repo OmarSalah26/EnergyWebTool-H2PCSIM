@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Draw</title>
+
+    <style>
+        html, body, #map {
+            height: 85vh;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .leaflet-layer,
+        .leaflet-control-zoom-in,
+        .leaflet-control-zoom-out,
+        .leaflet-control-attribution {
+        filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+    }
+
+    #coordinates-container {
+            position: absolute;
+            left: 20px;
+            background-color: rgba(10, 10, 10, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(212, 228, 30, 0.1);
+            color: yellow
+        }
+
+    
+
+
+
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    
+    <div id="coordinates-container">
+        <div id="latitude">Latitude: </div>
+        <div id="longitude">Longitude: </div>
+        <!-- Add a Print button -->
+        <button class="print-map">Print Map</button>
+
+    </div>
+    
+    </body>
+</html>
+
+<!-- leaflet js  -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js"></script>
+
+<!-- leaflet draw plugin  -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
+
+<!-- jQuery library -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<script>
+    // Initialize the map
+    var map = L.map('map').setView([43.8971, -78.8658], 13);
+
+    // Add the OpenStreetMap tiles
+    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    })
+    osm.addTo(map);
+
+    // leaflet draw 
+    var drawnFeatures = new L.FeatureGroup();
+    map.addLayer(drawnFeatures);
+
+    var drawControl = new L.Control.Draw({
+        // position: "topright",
+        edit: {
+            featureGroup: drawnFeatures,
+            remove: true // Enable removal of shapes when editing
+        },
+        draw: {
+		    polygon: {
+		     shapeOptions: {
+		      color: 'purple'
+		     },
+		    //  allowIntersection: false,
+		    //  drawError: {
+		    //   color: 'orange',
+		    //   timeout: 1000
+		    //  },
+		    },
+		    polyline: {
+		     shapeOptions: {
+		      color: 'red'
+		     },
+		    },
+		    rect: {
+		     shapeOptions: {
+		      color: 'green'
+		     },
+		    },
+		    circle: {
+		     shapeOptions: {
+		      color: 'steelblue'
+		     },
+		    },
+		   },
+ 
+    });
+    map.addControl(drawControl);
+
+    var isPopupOpen = false; // Track if the popup is open
+
+    map.on("draw:created", function(e) {
+        var type = e.layerType;
+        var layer = e.layer;
+
+        
+        // Create an input element to enter building information
+        var inputElement = document.createElement("input");
+        inputElement.type = "text";
+        inputElement.placeholder = "Enter building information";
+
+        // Create a button element to save the building name
+        var buttonElement = document.createElement("button");
+        buttonElement.textContent = "Save";
+
+        // Create a container element to hold the input and button
+        var containerElement = document.createElement("div");
+        containerElement.appendChild(inputElement);
+        containerElement.appendChild(buttonElement);
+
+        // Create a popup and bind it to the layer
+        var popup = L.popup().setContent(containerElement);
+        layer.bindPopup(popup);
+        drawnFeatures.addLayer(layer);
+
+        // Event listener for the button click
+        buttonElement.addEventListener("click", function() {
+            var buildingInfo = inputElement.value.trim();
+
+            if (buildingInfo !== "") {
+                // Calculate the area of the polygon
+                var area = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]);
+
+                // Format the area to a desired unit and decimal places
+                var formattedArea = L.GeometryUtil.formattedNumber(area, {
+                    unit: 'sqm',
+                    decimals: 2
+                });
+
+                // Store the building information along with the layer and area
+                var building = {
+                    layer: layer,
+                    info: buildingInfo,
+                    area: formattedArea
+                };
+
+                buildings.push(building);
+
+                // Update the popup content with the building information and area
+                var popupContent = `<p>${buildingInfo}</p><p>Size: ${formattedArea}</p>`;
+                layer.getPopup().setContent(popupContent);
+
+                // Update the building name element ID
+                var buildingNameElement = layer.getPopup().getContent().querySelector("p");
+                buildingNameElement.id = `building-${buildings.length}`;
+
+                // Close the popup
+                layer.closePopup();
+            }
+        });
+    });
+
+
+
+    map.on("popupopen", function(e) {
+        var layer = e.popup._source;
+        var buildingIndex = buildings.findIndex(function(building) {
+            return building.layer === layer;
+        });
+
+        // Update the building name in the popup
+        var buildingNameElement = document.getElementById(`building-${buildingIndex + 1}`);
+        if (buildingNameElement) {
+            buildingNameElement.textContent = buildings[buildingIndex].info;
+        }
+    });
+
+    map.on("click", function(e) {
+        buildings.forEach(function(building, index) {
+            var layer = building.layer;
+            if (layer.getBounds().contains(e.latlng)) {
+                // Open the popup for the clicked building
+                layer.openPopup();
+            }
+        });
+    });
+
+    
+    var buildings = []; // Array to store building information
+
+    map.on("draw:edited", function(e) {
+        var type = e.layerType;
+        var layers = e.layers;
+
+        // Loop through all edited layers
+        layers.eachLayer(function(layer) {
+            var buildingIndex = buildings.findIndex(function(building) {
+                return building.layer === layer;
+            });
+
+            if (buildingIndex !== -1) {
+                var buildingInfo = buildings[buildingIndex].info;
+                var area = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]);
+                var formattedArea = L.GeometryUtil.formattedNumber(area, {
+                    unit: 'sqm',
+                    decimals: 2
+                });
+
+                // Update the building information and area in the popup
+                var popupContent = `<p>${buildingInfo}</p><p>Size: ${formattedArea}</p>`;
+                layer.getPopup().setContent(popupContent);
+            }
+        });
+    });
+
+    // Add an event listener for the "mousemove" event on the map
+    map.on("mousemove", function (e) {
+                var latitude = e.latlng.lat.toFixed(6);
+                var longitude = e.latlng.lng.toFixed(6);
+
+                // Update coordinates container content
+                document.getElementById("latitude").textContent = "Latitude: " + latitude;
+                document.getElementById("longitude").textContent = "Longitude: " + longitude;
+            });
+
+            // Add an event listener for the "mouseout" event on the map
+            map.on("mouseout", function () {
+                // Clear coordinates container content when the mouse leaves the map
+                document.getElementById("latitude").textContent = "Latitude: ";
+                document.getElementById("longitude").textContent = "Longitude: ";
+            });
+           
+  // Function to print the map as PDF
+  $(".print-map").click(function(){
+    window.print();
+  })
+
+</script>
