@@ -1,11 +1,20 @@
--- Create Database energy_project;
+Create Database energy_project;
 use energy_project;
 
 CREATE TABLE User (
-    id INT PRIMARY KEY,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255),
-    role VARCHAR(255)
+    role VARCHAR(255),
+    password VARCHAR(255)
 );
+-- Create the KPI table
+CREATE TABLE KPI (
+    id INT PRIMARY KEY PRIMARY KEY,
+    name VARCHAR(255),
+    description TEXT,
+    value VARCHAR(255)
+);
+
 
 -- Table for GeoLocation
 CREATE TABLE GeoLocation (
@@ -37,11 +46,20 @@ CREATE TABLE Site (
     FOREIGN KEY (location_id) REFERENCES GeoLocation(id)
 );
 
+CREATE TABLE Site_KPI (
+   Site_id INT,
+    kpi_id INT,
+    PRIMARY KEY (Site_id, kpi_id),
+    FOREIGN KEY (Site_id) REFERENCES Site(id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+
+-- ---------------------------------------------------
 CREATE TABLE Load_ (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255),
-    load_type VARCHAR(255), # Type of the load (e.g., "energy", "water", "gas").
-    demand DECIMAL(10, 2),  # Demand value for the load.
+    load_type VARCHAR(255),  # Type of the load (e.g., "energy", "water", "gas").
+    demand DECIMAL(10, 2),   # Demand value for the load.           
     site_id INT,
     FOREIGN KEY (site_id) REFERENCES Site(id)
     
@@ -66,7 +84,24 @@ CREATE TABLE Utility (
     FOREIGN KEY (site_id) REFERENCES Site(id),
 	FOREIGN KEY (location_id) REFERENCES GeoLocation(id)
 );
+-- Junction table for the many-to-many relationship between Site and Organization
+CREATE TABLE Site_Utility (
+    site_id INT,
+    Utility_id INT,
+    PRIMARY KEY (site_id, Utility_id),
+    FOREIGN KEY (site_id) REFERENCES Site(id),
+    FOREIGN KEY (Utility_id) REFERENCES Utility(id)
+);
 
+CREATE TABLE Utility_KPI (
+   Utility_id INT,
+    kpi_id INT,
+    PRIMARY KEY (Utility_id, kpi_id),
+    FOREIGN KEY (Utility_id) REFERENCES Utility   (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+
+-- ---------------------------------------------------
 -- Table for Organization
 CREATE TABLE Organization (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -84,7 +119,15 @@ CREATE TABLE Site_Organization (
     FOREIGN KEY (organization_id) REFERENCES Organization(id)
 );
 
+CREATE TABLE Organization_KPI (
+   Organization_id INT,
+    kpi_id INT,
+    PRIMARY KEY (Organization_id, kpi_id),
+    FOREIGN KEY (Organization_id) REFERENCES Organization   (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
 
+-- ---------------------------------------------------
 -- Create the HydrogenFuelCell table
 CREATE TABLE HydrogenFuelCell (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -143,6 +186,23 @@ CREATE TABLE HydrogenFuelCellPlant_HydrogenFuelCell (
     FOREIGN KEY (hydrogen_fuel_cell_plant_id) REFERENCES HydrogenFuelCellPlant(id),
     FOREIGN KEY (hydrogen_fuel_cell_id) REFERENCES HydrogenFuelCell(id)
 );
+CREATE TABLE HydrogenFuelCell_KPI (
+   HydrogenFuelCell_id INT,
+    kpi_id INT,
+    PRIMARY KEY (HydrogenFuelCell_id, kpi_id),
+    FOREIGN KEY (HydrogenFuelCell_id) REFERENCES HydrogenFuelCell   (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+
+
+CREATE TABLE HydrogenFuelCellPlant_KPI (
+   HydrogenFuelCellPlant_id INT,
+    kpi_id INT,
+    PRIMARY KEY (HydrogenFuelCellPlant_id, kpi_id),
+    FOREIGN KEY (HydrogenFuelCellPlant_id) REFERENCES HydrogenFuelCellPlant   (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+-- ------------------------------------------------------------------------------------
 
 
 -- Table for Electrolyzer
@@ -205,6 +265,22 @@ CREATE TABLE HydrogenElectrolyzerPlant_Electrolyzer (
     FOREIGN KEY (Electrolyzer_id) REFERENCES Electrolyzer(id)
 );
 
+CREATE TABLE Electrolyzer_KPI (
+   Electrolyzer_id INT,
+    kpi_id INT,
+    PRIMARY KEY (Electrolyzer_id, kpi_id),
+    FOREIGN KEY (Electrolyzer_id) REFERENCES Electrolyzer   (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+
+CREATE TABLE HydrogenElectrolyzerPlant_KPI (
+   HydrogenElectrolyzerPlant_id INT,
+    kpi_id INT,
+    PRIMARY KEY (HydrogenElectrolyzerPlant_id, kpi_id),
+    FOREIGN KEY (HydrogenElectrolyzerPlant_id) REFERENCES HydrogenElectrolyzerPlant   (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+-- ------------------------------------------------------------------------------------
 
 -- Table for Biomass
 CREATE TABLE Biomass (
@@ -240,6 +316,16 @@ CREATE TABLE Site_Biomass (
     FOREIGN KEY (biomass_id) REFERENCES Biomass(id)
 );
 
+CREATE TABLE Biomass_KPI (
+   Biomass_id INT,
+    kpi_id INT,
+    PRIMARY KEY (Biomass_id, kpi_id),
+    FOREIGN KEY (Biomass_id) REFERENCES Biomass   (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+
+-- ------------------------------------------------------------------------------------
+
 
 
 
@@ -268,6 +354,15 @@ CREATE TABLE Site_Converter_Inverter (
     FOREIGN KEY (Converter_Inverter_id) REFERENCES Converter_Inverter(id)
 );
 
+CREATE TABLE Converter_Inverter_KPI (
+   Converter_Inverter_id INT,
+    kpi_id INT,
+    PRIMARY KEY (Converter_Inverter_id, kpi_id),
+    FOREIGN KEY (Converter_Inverter_id) REFERENCES Converter_Inverter   (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+
+-- ------------------------------------------------------------------------------------
 
 
 -- Table for GeoThermal
@@ -304,6 +399,15 @@ CREATE TABLE Site_GeoThermal (
     FOREIGN KEY (geothermal_id) REFERENCES GeoThermal(id)
 );
 
+CREATE TABLE GeoThermal_KPI (
+   GeoThermal_id INT,
+    kpi_id INT,
+    PRIMARY KEY (GeoThermal_id, kpi_id),
+    FOREIGN KEY (GeoThermal_id) REFERENCES GeoThermal   (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+
+-- ------------------------------------------------------------------------------------
 
 -- Table for Hydropower
 CREATE TABLE Hydropower (
@@ -340,8 +444,15 @@ CREATE TABLE Site_Hydropower (
 );
 
 
+CREATE TABLE Hydropower_KPI (
+   Hydropower_id INT,
+    kpi_id INT,
+    PRIMARY KEY (Hydropower_id, kpi_id),
+    FOREIGN KEY (Hydropower_id) REFERENCES Hydropower   (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
 
-
+-- ------------------------------------------------------------------------------------
 
 -- Table for PVArray
 CREATE TABLE PVArray (
@@ -399,6 +510,22 @@ CREATE TABLE PV_farm_PVArray (
     FOREIGN KEY (pv_farm_id) REFERENCES PV_farm(id),
     FOREIGN KEY (pv_array_id) REFERENCES PVArray(id)
 );
+CREATE TABLE PVArray_KPI (
+   PVArray_id INT,
+    kpi_id INT,
+    PRIMARY KEY (PVArray_id, kpi_id),
+    FOREIGN KEY (PVArray_id) REFERENCES PVArray   (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+
+CREATE TABLE PV_farm_KPI (
+   PV_farm_id INT,
+    kpi_id INT,
+    PRIMARY KEY (PV_farm_id, kpi_id),
+    FOREIGN KEY (PV_farm_id) REFERENCES PV_farm   (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+-- ------------------------------------------------------------------------------------
 
 
 -- Table for WindTurbine
@@ -466,6 +593,22 @@ CREATE TABLE WindFarm_WindTurbine (
     FOREIGN KEY (wind_turbine_id) REFERENCES WindTurbine(id)
 );
 
+CREATE TABLE WindTurbine_KPI (
+    WindTurbine_id INT,
+    kpi_id VARCHAR(255),
+    PRIMARY KEY (WindTurbine_id, kpi_id),
+    FOREIGN KEY (WindTurbine_id) REFERENCES WindTurbine   (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+
+CREATE TABLE WindFarm_KPI (
+    WindFarm_id INT,
+    kpi_id INT,
+    PRIMARY KEY (WindFarm_id, kpi_id),
+    FOREIGN KEY (WindFarm_id) REFERENCES WindFarm   (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+-- ------------------------------------------------------------------------------------
 
 -- Table for ElectricBattery
 CREATE TABLE ElectricBattery (
@@ -497,6 +640,15 @@ CREATE TABLE Site_ElectricBattery (
     FOREIGN KEY (electric_battery_id) REFERENCES ElectricBattery(id)
 );
 
+CREATE TABLE ElectricBattery_KPI (
+    ElectricBattery_id INT,
+    kpi_id INT,
+    PRIMARY KEY (ElectricBattery_id, kpi_id),
+    FOREIGN KEY (ElectricBattery_id) REFERENCES ElectricBattery   (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+-- ------------------------------------------------------------------------------------
+
 
 
 -- Table for Flywheel_Energy_Storage
@@ -527,6 +679,15 @@ CREATE TABLE Site_Flywheel_Energy_Storage (
 );
 
 
+CREATE TABLE Flywheel_Energy_Storage_KPI (
+    Flywheel_Energy_Storage_id INT,
+    kpi_id INT,
+    PRIMARY KEY (Flywheel_Energy_Storage_id, kpi_id),
+    FOREIGN KEY (Flywheel_Energy_Storage_id) REFERENCES Flywheel_Energy_Storage   (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+-- ------------------------------------------------------------------------------------
+
 -- Table for HydrogenEnergyStorage
 CREATE TABLE HydrogenEnergyStorage (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -556,6 +717,14 @@ CREATE TABLE Site_HydrogenEnergyStorage (
 );
 
 
+CREATE TABLE HydrogenEnergyStorage_KPI (
+    HydrogenEnergyStorage_id INT,
+    kpi_id INT,
+    PRIMARY KEY (HydrogenEnergyStorage_id, kpi_id),
+    FOREIGN KEY (HydrogenEnergyStorage_id) REFERENCES HydrogenEnergyStorage   (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+-- ------------------------------------------------------------------------------------
 
 -- Table for ThermalBattery
 CREATE TABLE ThermalBattery (
@@ -584,6 +753,14 @@ CREATE TABLE Site_ThermalBattery (
     FOREIGN KEY (thermal_battery_id) REFERENCES ThermalBattery(id)
 );
 
+CREATE TABLE ThermalBattery_KPI (
+    ThermalBattery_id INT,
+    kpi_id INT,
+    PRIMARY KEY (ThermalBattery_id, kpi_id),
+    FOREIGN KEY (ThermalBattery_id) REFERENCES ThermalBattery  (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+-- ------------------------------------------------------------------------------------
 
 
 -- Table for CombinedHeatPower
@@ -621,6 +798,15 @@ CREATE TABLE Site_CombinedHeatPower (
     FOREIGN KEY (combined_heat_power_id) REFERENCES CombinedHeatPower(id)
 );
 
+CREATE TABLE CombinedHeatPower_KPI (
+    CombinedHeatPower_id INT,
+    kpi_id INT,
+    PRIMARY KEY (CombinedHeatPower_id, kpi_id),
+    FOREIGN KEY (CombinedHeatPower_id) REFERENCES CombinedHeatPower  (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+-- ------------------------------------------------------------------------------------
+
 -- Table for Generator
 CREATE TABLE Generator (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -655,7 +841,14 @@ CREATE TABLE Site_Generator (
     FOREIGN KEY (generator_id) REFERENCES Generator(id)
 );
 
-
+CREATE TABLE Generator_KPI (
+    Generator_id INT,
+    kpi_id INT,
+    PRIMARY KEY (Generator_id, kpi_id),
+    FOREIGN KEY (Generator_id) REFERENCES Generator  (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+-- ------------------------------------------------------------------------------------
 
 -- Create the SteamMethaneReformer table
 CREATE TABLE SteamMethaneReformer (
@@ -690,7 +883,14 @@ CREATE TABLE Site_SteamMethaneReformer (
     FOREIGN KEY (site_id) REFERENCES Site(id),
     FOREIGN KEY (steam_methane_reformer_id) REFERENCES SteamMethaneReformer(id)
 );
-
+CREATE TABLE SteamMethaneReformer_KPI (
+    SteamMethaneReformer_id INT,
+    kpi_id INT,
+    PRIMARY KEY (SteamMethaneReformer_id, kpi_id),
+    FOREIGN KEY (SteamMethaneReformer_id) REFERENCES SteamMethaneReformer  (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+-- ------------------------------------------------------------------------------------
 -- Table for HydrogenBasedCPHS
 CREATE TABLE HydrogenBasedCPHS (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -723,7 +923,14 @@ CREATE TABLE Site_HydrogenBasedCPHS (
     FOREIGN KEY (site_id) REFERENCES Site(id),
     FOREIGN KEY (hydrogen_based_cphs_id) REFERENCES HydrogenBasedCPHS(id)
 );
-
+CREATE TABLE HydrogenBasedCPHS_KPI (
+    HydrogenBasedCPHS_id INT,
+    kpi_id INT,
+    PRIMARY KEY (HydrogenBasedCPHS_id, kpi_id),
+    FOREIGN KEY (HydrogenBasedCPHS_id) REFERENCES HydrogenBasedCPHS (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+-- ------------------------------------------------------------------------------------
 -- Table for WaterTreatmentPlant
 CREATE TABLE WaterTreatmentPlant (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -756,8 +963,14 @@ CREATE TABLE Site_WaterTreatmentPlant (
     FOREIGN KEY (water_treatment_plant_id) REFERENCES WaterTreatmentPlant(id)
 );
 
-
-
+CREATE TABLE WaterTreatmentPlant_KPI (
+    WaterTreatmentPlant_id INT,
+    kpi_id INT,
+    PRIMARY KEY (WaterTreatmentPlant_id, kpi_id),
+    FOREIGN KEY (WaterTreatmentPlant_id) REFERENCES WaterTreatmentPlant (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
+);
+-- ------------------------------------------------------------------------------------
 -- Table for PowerPlant
 CREATE TABLE PowerPlant (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -788,4 +1001,12 @@ CREATE TABLE Site_PowerPlant (
     PRIMARY KEY (site_id, power_plant_id),
     FOREIGN KEY (site_id) REFERENCES Site(id),
     FOREIGN KEY (power_plant_id) REFERENCES PowerPlant(id)
+);
+-- Create the Energy_Asset_KPI junction table
+CREATE TABLE PowerPlant_KPI (
+    PowerPlant_id INT,
+    kpi_id INT,
+    PRIMARY KEY (PowerPlant_id, kpi_id),
+    FOREIGN KEY (PowerPlant_id) REFERENCES PowerPlant (id),
+    FOREIGN KEY (kpi_id) REFERENCES KPI(id)
 );
