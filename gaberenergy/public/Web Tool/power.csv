@@ -1,0 +1,3 @@
+GENERATION_PROJECT,gen_tech,gen_load_zone,gen_connect_cost_per_mw,gen_capacity_limit_mw,gen_full_load_heat_rate,gen_variable_om,gen_max_age,gen_min_build_capacity,gen_scheduled_outage_rate,gen_forced_outage_rate,gen_is_variable,gen_is_baseload,gen_is_cogen,gen_energy_source,gen_unit_size,gen_ccs_capture_efficiency,gen_ccs_energy_load,gen_storage_efficiency,gen_store_to_release_ratio,build_gen_predetermined,Latitude,Longitude
+N-Darlington,Nuclear,L1C,163081.1,0,2.632825,6.0822,100,0,0.0075,0.0241,0,0,0,Uranium,0,0,0,0,0,3512,43.8843,-78.8537
+N-Pickering,Nuclear,Ajax_Pickering,57566.6,0,2.632825,6.0822,100,0,0.08,0.12,0,0,0,Uranium,0,0,0,0,0,3100,43.8356,-79.089

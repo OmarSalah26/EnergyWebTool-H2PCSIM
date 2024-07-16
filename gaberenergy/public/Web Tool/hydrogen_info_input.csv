@@ -1,0 +1,14 @@
+HYDROGEN_PROJECT,hydrogen_tech,hydrogenp_energy_source,h_plant_load_zone,h_plant_max_age,h_plant_ccs_energy_load,hydrogenp_ccs_capture_efficiency,h_plant_variable_om,h_plant_m3_per_kg,h_plant_MW_per_kg,h_plant_NG_MMBTU_per_kg,h_plant_uses_fuel,Latitude,Longitude
+L0BN_Electrolysis,Electrolysis,Water,L0BNorth,30,.,.,5.17,0.015,0.05,.,0,44.1094,-78.751298
+L0BS_Electrolysis,Electrolysis,Water,L0BSouth,30,.,.,5.17,0.015,0.05,.,0,43.9909,-78.7698
+L1C_Electrolysis,Electrolysis,Water,L1C,30,.,.,5.17,0.015,0.05,.,0,43.8883,-78.694316
+L1B_Electrolysis,Electrolysis,Water,L1B,30,.,.,5.17,0.015,0.05,.,0,43.9010046,-78.618991
+L0K_Electrolysis,Electrolysis,Water,L0K,30,.,.,5.17,0.015,0.05,.,0,44.770841,-80.099252
+Oshawa_Electrolysis,Electrolysis,Water,Oshawa,30,.,.,5.17,0.015,0.05,.,0,43.859028,-78.848828
+Whitby_Electrolysis,Electrolysis,Water,Whitby,30,.,.,5.17,0.015,0.05,.,0,43.852622,-78.903758
+L0CN_Electrolysis,Electrolysis,Water,L0CNorth,30,.,.,5.17,0.015,0.05,.,0,44.215843,-78.962282
+L0CS_Electrolysis,Electrolysis,Water,L0CSouth,30,.,.,5.17,0.015,0.05,.,0,44.01174,-79.180635
+Aj_Pick_Electrolysis,Electrolysis,Water,Ajax_Pickering,30,.,.,5.17,0.015,0.05,.,0,43.833167,-78.9759
+L0E_Electrolysis,Electrolysis,Water,L0E,30,.,.,5.17,0.015,0.05,.,0,44.294027,-79.474242
+L9L_Electrolysis,Electrolysis,Water,L9L,30,.,.,5.17,0.015,0.05,.,0,44.107576,-78.94128
+L9P_Electrolysis,Electrolysis,Water,L9P,30,.,.,5.17,0.015,0.05,.,0,44.102388,-79.115476

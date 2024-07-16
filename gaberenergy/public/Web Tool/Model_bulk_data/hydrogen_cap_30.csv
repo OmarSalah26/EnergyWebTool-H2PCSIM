@@ -1,0 +1,14 @@
+HYDROGEN_PROJECT,PERIOD,hydrogen_tech,h_plant_load_zone,hydrogenp_energy_source,HPlantCapacity,HPlantCapitalRecovery,HPlantFixedOMCosts
+Aj_Pick_Electrolysis,2022,Electrolysis,Ajax_Pickering,Water,0,0,0
+L0BN_Electrolysis,2022,Electrolysis,L0BNorth,Water,0,0,0
+L0BS_Electrolysis,2022,Electrolysis,L0BSouth,Water,0,0,0
+L0CN_Electrolysis,2022,Electrolysis,L0CNorth,Water,0,0,0
+L0CS_Electrolysis,2022,Electrolysis,L0CSouth,Water,0,0,0
+L0E_Electrolysis,2022,Electrolysis,L0E,Water,0,0,0
+L0K_Electrolysis,2022,Electrolysis,L0K,Water,0,0,0
+L1B_Electrolysis,2022,Electrolysis,L1B,Water,0,0,0
+L1C_Electrolysis,2022,Electrolysis,L1C,Water,0,0,0
+L9L_Electrolysis,2022,Electrolysis,L9L,Water,0,0,0
+L9P_Electrolysis,2022,Electrolysis,L9P,Water,0,0,0
+Oshawa_Electrolysis,2022,Electrolysis,Oshawa,Water,0,0,0
+Whitby_Electrolysis,2022,Electrolysis,Whitby,Water,4176.48,1.44673e+07,8.35295e+06

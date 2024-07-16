@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ouptut</title>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <!-- Leaflet Sidebar CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-sidebar-v2/leaflet-sidebar.min.css" />
+
+  <!-- markercluster -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+  <!-- Bootstrap-Switch CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/css/bootstrap3/bootstrap-switch.min.css">
+
+    
+    <!-- Search Geocoder CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+
+  <!-- Search Geocoder CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder@1.13.1/dist/Control.Geocoder.css" />
+  
+
+
+  
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+      background-color: #e6e995;
+    }
+
+    #header {
+      background-color:  #181818;
+      color: #F5D10D;
+      text-align: center;
+      padding: 10px 0;
+    }
+
+     /* Yellow and black theme for the menu bar */
+     #menu-bar {
+      background-color:  #e9e647;
+      color:black;
+      text-align: center;
+      padding: 10px 0;
+    }
+
+    #menu-bar .menu-button {
+      margin: 5px;
+      padding: 7px;
+      border: none;
+      background-color: rgb(102, 102, 83);
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+      outline: 3px solid lightyellow;
+      outline-offset: -1px;
+      transition: 0.3s ease-in-out;
+
+      ;
+    }
+
+    #menu-bar .menu-button:hover {
+      background-color: black;
+      outline-offset: 3px;
+    }
+
+  
+
+    
+
+    
+  #map-container {
+    position: fixed;
+    top: 70px;
+    left: 250px;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+  }
+
+  .row {
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+
+  #map {
+    height: 100%;
+    width: 100%;
+  }
+    .leaflet-layer,
+    .leaflet-control-zoom-in,
+    .leaflet-control-zoom-out,
+    .leaflet-control-attribution {
+      filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+    }
+
+    
+  .col-lg-3 {
+    background-color: black;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    bottom: 0;
+    width: 250px;
+    padding: 10px;
+    z-index: 1000;
+    overflow-y: auto; /* Add overflow-y to enable scrolling in the sidebar if needed */
+  }
+
+
+  .col-lg-9 {
+    position: fixed;
+    top: 70px;
+    left: 250px; /* Adjust the left position to account for the wider side panel */
+    right: 0;
+    bottom: 0;
+    padding: 0;
+    z-index: 1;
+  }
+
+
+    #side-panel h3 {
+      margin: 10px 0;
+      padding: 10px;
+      background-color: grey;
+      color: yellow;
+      text-align: center;
+      border-radius: 5px;
+    }
+
+    .button-container {
+      margin-top: 10px;
+    }
+
+    .button {
+    margin: 5px;
+    padding: 5px; /* Reduce the padding of the buttons */
+    border: none;
+    background-color: #484a4d;
+    color: white;
+    cursor: pointer;
+    border-radius: 15px;
+    width: 100%;
+    height: 40px;
+    
+  }
+    .button:hover {
+      background-color: grey;
+    }
+
+    /* Adjust marker and popup styles for better visibility on the dark map */
+    .leaflet-popup-content-wrapper {
+      background-color: rgba(0, 0, 0, 0.8);
+      color: #fff;
+    }
+
+    .leaflet-popup-content-wrapper b {
+      display: block;
+      margin-bottom: 5px;
+      color: #ff0;
+    }
+
+    /* Custom toggle switch */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgb(146, 146, 117);
+    transition: .4s;
+    border-radius: 20px; /* Adjust the border-radius to make it more rounded */
+  }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: black;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+        input:checked + .slider {
+        background-color: yellow;
+    }
+
+    input:focus + .slider {
+        box-shadow: 0 0 1px rgb(177, 177, 91);
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(20px); /* Adjust the position of the slider button */
+    }
+
+
+    /* Dark mode styles */
+    body.dark-mode {
+      background-color: #333;
+      color: #fff;
+    }
+
+    .form-check-label {
+        color: lightgray;
+        font-size: 13.05px;
+    }
+    
+    /* Style for the images in the popup */
+.zone-image {
+  display: block;
+  max-width: 500%;
+  height: auto;
+  margin: 10px auto;
+}
+  
+  
+
+  </style>
+</head>
+<body>
+    <div id="menu-bar" class="py-3">
+        <!-- Add your menu items here -->
+        <h1>OUTPUT</h1>
+      </div>
+
+  <div class="col-lg-3">
+    <div id="side-panel">
+       
+    
+    <!-- Polygons - Zones -->
+    <div>
+    <button class="button" onclick="resetMapView()" >Reset Map View</button>
+
+    </div>
+    
+      <h3 class="mb-3">Display Zones</h3>
+    <div class="form-check mb-3">
+      <!-- Add the "toggle-switch" class to the parent div -->
+      <label class="form-check-label toggle-switch" for="zone1Checkbox">
+        <input class="form-check-input" type="checkbox" value="zone1" onchange="toggleZone('zone1')" id="zone1Checkbox">
+        <span class="slider"></span>
+      </label>
+      <label class="form-check-label" for="zone1Checkbox">Zone 1: Oshawa</label>
+    </div>
+    <div class="form-check mb-3">
+      <!-- Add the "toggle-switch" class to the parent div -->
+      <label class="form-check-label toggle-switch" for="zone2Checkbox">
+        <input class="form-check-input" type="checkbox" value="zone2" onchange="toggleZone('zone2')" id="zone2Checkbox">
+        <span class="slider"></span>
+      </label>
+      <label class="form-check-label" for="zone2Checkbox">Zone 2: Whitby</label>
+    </div>
+    <div class="form-check mb-3">
+      <!-- Add the "toggle-switch" class to the parent div -->
+      <label class="form-check-label toggle-switch" for="zone3Checkbox">
+        <input class="form-check-input" type="checkbox" value="zone3" onchange="toggleZone('zone3')" id="zone3Checkbox">
+        <span class="slider"></span>
+      </label>
+      <label class="form-check-label" for="zone3Checkbox">Zone 3: Ajax_Pickering</label>
+    </div>
+    <div class="form-check mb-3">
+      <!-- Add the "toggle-switch" class to the parent div -->
+      <label class="form-check-label toggle-switch" for="zone4Checkbox">
+        <input class="form-check-input" type="checkbox" value="zone4" onchange="toggleZone('zone4')" id="zone4Checkbox">
+        <span class="slider"></span>
+      </label>
+      <label class="form-check-label" for="zone4Checkbox">Zone 4: L1B</label>
+    </div>
+    <div class="form-check mb-3">
+      <!-- Add the "toggle-switch" class to the parent div -->
+      <label class="form-check-label toggle-switch" for="zone5Checkbox">
+        <input class="form-check-input" type="checkbox" value="zone5" onchange="toggleZone('zone5')" id="zone5Checkbox">
+        <span class="slider"></span>
+      </label>
+      <label class="form-check-label" for="zone5Checkbox">Zone 5: L9P</label>
+    </div>
+    <div class="form-check mb-3">
+      <!-- Add the "toggle-switch" class to the parent div -->
+      <label class="form-check-label toggle-switch" for="zone6Checkbox">
+        <input class="form-check-input" type="checkbox" value="zone6" onchange="toggleZone('zone6')" id="zone6Checkbox">
+        <span class="slider"></span>
+      </label>
+      <label class="form-check-label" for="zone6Checkbox">Zone 6: L1C</label>
+    </div>
+    <div class="form-check mb-3">
+      <!-- Add the "toggle-switch" class to the parent div -->
+      <label class="form-check-label toggle-switch" for="zone7Checkbox">
+        <input class="form-check-input" type="checkbox" value="zone7" onchange="toggleZone('zone7')" id="zone7Checkbox">
+        <span class="slider"></span>
+      </label>
+      <label class="form-check-label" for="zone7Checkbox">Zone 7: L0B_North</label>
+    </div>
+    <div class="form-check mb-3">
+      <!-- Add the "toggle-switch" class to the parent div -->
+      <label class="form-check-label toggle-switch" for="zone8Checkbox">
+        <input class="form-check-input" type="checkbox" value="zone8" onchange="toggleZone('zone8')" id="zone8Checkbox">
+        <span class="slider"></span>
+      </label>
+      <label class="form-check-label" for="zone8Checkbox">Zone 8: L0B_South</label>
+    </div>
+    <div class="form-check mb-3">
+      <!-- Add the "toggle-switch" class to the parent div -->
+      <label class="form-check-label toggle-switch" for="zone9Checkbox">
+        <input class="form-check-input" type="checkbox" value="zone9" onchange="toggleZone('zone9')" id="zone9Checkbox">
+        <span class="slider"></span>
+      </label>
+      <label class="form-check-label" for="zone9Checkbox">Zone 9: L0C_North</label>
+    </div>
+    <div class="form-check mb-3">
+      <!-- Add the "toggle-switch" class to the parent div -->
+      <label class="form-check-label toggle-switch" for="zone10Checkbox">
+        <input class="form-check-input" type="checkbox" value="zone10" onchange="toggleZone('zone10')" id="zone10Checkbox">
+        <span class="slider"></span>
+      </label>
+      <label class="form-check-label" for="zone10Checkbox">Zone 10: L0C_South</label>
+    </div>
+    <div class="form-check mb-3">
+      <!-- Add the "toggle-switch" class to the parent div -->
+      <label class="form-check-label toggle-switch" for="zone11Checkbox">
+        <input class="form-check-input" type="checkbox" value="zone11" onchange="toggleZone('zone11')" id="zone11Checkbox">
+        <span class="slider"></span>
+      </label>
+      <label class="form-check-label" for="zone11Checkbox">Zone 11: L9L</label>
+    </div>
+    <div class="form-check mb-3">
+      <!-- Add the "toggle-switch" class to the parent div -->
+      <label class="form-check-label toggle-switch" for="zone12Checkbox">
+        <input class="form-check-input" type="checkbox" value="zone12" onchange="toggleZone('zone12')" id="zone12Checkbox">
+        <span class="slider"></span>
+      </label>
+      <label class="form-check-label" for="zone12Checkbox">Zone 12: LOE </label>
+    </div>
+    <div class="form-check mb-3">
+      <!-- Add the "toggle-switch" class to the parent div -->
+      <label class="form-check-label toggle-switch" for="zone13Checkbox">
+        <input class="form-check-input" type="checkbox" value="zone13" onchange="toggleZone('zone13')" id="zone13Checkbox">
+        <span class="slider"></span>
+      </label>
+      <label class="form-check-label" for="zone13Checkbox">Zone 13: L1J </label>
+    </div>
+ 
+
+
+     <!-- Markers -->
+      <h3 class="mb-3"> Markers</h3>
+      <div class="button-container">
+        <div class="form-check mb-3">
+          <!-- Add the "toggle-switch" class to the parent div -->
+          <label class="form-check-label toggle-switch" for="data1Checkbox">
+            <input class="form-check-input" type="checkbox" value="data1" onchange="toggleData('data1')" id="data1Checkbox">
+            <span class="slider"></span>
+          </label>
+          <label class="form-check-label" for="data1Checkbox">Water plants</label>
+        </div>
+
+        <div class="form-check">
+          <!-- Add the "toggle-switch" class to the parent div -->
+          <label class="form-check-label toggle-switch" for="data2Checkbox">
+            <input class="form-check-input" type="checkbox" value="data2" onchange="toggleData('data2')" id="data2Checkbox">
+            <span class="slider"></span>
+          </label>
+          <label class="form-check-label" for="data2Checkbox">Hydrogen Plant</label>
+        </div>
+
+        <div class="form-check">
+            <!-- Add the "toggle-switch" class to the parent div -->
+            <label class="form-check-label toggle-switch" for="data3Checkbox">
+              <input class="form-check-input" type="checkbox" value="data3" onchange="toggleData('data3')" id="data3Checkbox">
+              <span class="slider"></span>
+            </label>
+            <label class="form-check-label" for="data3Checkbox">Power Plants</label>
+          </div>
+
+
+
+      </div>
+    </div>
+</div>
+
+      </div>
+    </div>  
+</div>
+
+      
+    
+
+  <!-- Map on the right -->
+  <div class="col-lg-9">
+    <div id="map-container">
+      <div id="map"></div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <div id="sidebar-content"></div>
+  </div>
+
+  <!-- Bootstrap JS and other scripts -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <!-- Leaflet Sidebar JS -->
+  <script src="https://unpkg.com/leaflet-sidebar-v2/leaflet-sidebar.min.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+  <script src="https://unpkg.com/papaparse@5.0.2/papaparse.min.js"></script>
+
+ <!-- Leaflet Search Control Geocoder JS -->
+
+ <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+  <!-- Leaflet Control Geocoder JS -->
+  <script src="https://unpkg.com/leaflet-control-geocoder@1.13.1/dist/Control.Geocoder.js"></script>
+  <!-- @turf/turf for geodesic area calculation -->
+  <script src="https://unpkg.com/@turf/turf@6.3.0"></script>
+
+  <script src="https://unpkg.com/leaflet-control-geocoder@1.13.1/dist/Control.Geocoder.js"></script>
+
+ <!-- ... (your HTML code) ... -->
+
+<!-- Your script -->
+<script>
+  // Initialize the map
+  const map = L.map('map').setView([43.8971, -78.8658], 9);
+
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+   }).addTo(map);
+
+  // Adding Leaflet Search Control Geocoder
+  // Add Zoom Control
+  L.control.zoom({ position: 'topright' }).addTo(map);
+
+  // Create the search control and add it to the map
+  const geocoder = L.Control.geocoder({
+    defaultMarkGeocode: false
+  })
+  .on('markgeocode', function(e) {
+    map.fitBounds(e.geocode.bbox);
+  })
+  .addTo(map);
+  
+
+   // Add an event listener for the "mousemove" event on the map
+map.on("mousemove", function (e) {
+  var latitude = e.latlng.lat.toFixed(6);
+  var longitude = e.latlng.lng.toFixed(6);
+
+  // Update coordinates container content
+  document.getElementById("latitude").textContent = "Latitude: " + latitude;
+  document.getElementById("longitude").textContent = "Longitude: " + longitude;
+});
+
+// Add an event listener for the "mouseout" event on the map
+map.on("mouseout", function () {
+  // Clear coordinates container content when the mouse leaves the map
+  document.getElementById("latitude").textContent = "Latitude: ";
+  document.getElementById("longitude").textContent = "Longitude: ";
+});
+
+
+
+  // Initialize an array to keep track of loaded datasets
+  const loadedDatasets = [];
+
+  // Function to load or clear data based on checkbox state
+  function toggleData(dataset) {
+    const checkbox = document.querySelector(`input[type="checkbox"][value="${dataset}"]`);
+    if (!checkbox) return; // Check if the checkbox element exists
+    const isChecked = checkbox.checked;
+
+    if (isChecked) {
+      loadCSVData(dataset);
+    } else {
+      clearData(dataset);
+    }
+  }
+
+  function loadCSVData(dataset) {
+    const csvFilePath = getCSVFilePath(dataset);
+    if (!csvFilePath) return;
+
+    let markerIcon;
+    switch (dataset) {
+      case 'data1':
+        markerIcon = L.icon({
+          iconUrl: './water.png',
+          iconSize: [25, 25],
+          iconAnchor: [16, 32],
+        });
+        break;
+      case 'data2':
+        markerIcon = L.icon({
+          iconUrl: 'hydrogen.png',
+          iconSize: [25, 25],
+          iconAnchor: [16, 16],
+        });
+        break;
+      case 'data3':
+          markerIcon = L.icon({
+            iconUrl: './power.png',
+            iconSize: [25, 25],
+            iconAnchor: [16, 16],
+          });
+          break;
+      // Add more cases for additional datasets and their corresponding icons
+      default:
+        markerIcon = L.icon.Default(); // Use default icon if no custom icon is specified
+    }
+
+    let popupContentTemplate1;
+    switch (dataset) {
+      case 'data1':
+        popupContentTemplate1 = (row) => `<b>Zone name</b> ${row.water_plants_zone}<b>Water Tech</b> ${row.water_tech}<br><b>Water Plants Capacity</b> ${row.water_plants_capacity}<b>Water Plants Variable OM</b> ${row.water_plants_variable_om}`;
+        break;
+      case 'data2':
+      popupContentTemplate1 = (row) => `<b>Zone name</b> ${row.h_plant_load_zone}<b>Hydrogen Tech</b> ${row.hydrogen_tech}<b>Hydrogen Plant Capital</b> ${row.HPlantCapacity}<b>Hydrogen Plant Capital Recovery</b> ${row.HPlantCapitalRecovery}<b>Hydrogen Plant Fixed OM Cost</b> ${row.HPlantFixedOMCosts}<br><b>Hydrogen Plant Max Age</b> ${row.h_plant_max_age}<br><b>Hydrogen Plant Variable OM</b> ${row.h_plant_variable_om}<b>Hydrogen Plant M3 Per KG</b> ${row.h_plant_m3_per_kg}<b>Hydrogen Plant MW Per KG</b> ${row.h_plant_MW_per_kg}`;
+        break;
+      case 'data3':
+        popupContentTemplate1 = (row) => `<b>Zone name</b> ${row.gen_load_zone}<b>Power Tech</b> ${row.gen_tech}<b>Generation Connect Cost per MW</b> ${row.gen_connect_cost_per_mw}<br><b>Full load heat rate</b> ${row.gen_full_load_heat_rate}<br><b>Generation Variable OM</b> ${row.gen_variable_om}`;
+        break;
+      
+    
+      // Add more cases for additional datasets and their corresponding popup content templates
+    }
+
+    Papa.parse(csvFilePath, {
+      header: true,
+      download: true,
+      skipEmptyLines: true,
+      complete: function (results) {
+        const data = results.data;
+        data.forEach(function (row) {
+          const lat = parseFloat(row.Latitude);
+          const lon = parseFloat(row.Longitude);
+
+          const popupContent1 = popupContentTemplate1(row); // Generate popup content based on the dataset
+
+          // Create a marker with the popup content and custom icon
+          const marker = L.marker([lat, lon], { icon: markerIcon, dataset: dataset }).addTo(map).bindPopup(popupContent1);
+        });
+
+        // Add the loaded dataset to the array
+        loadedDatasets.push({ dataset });
+      },
+    });
+  }
+
+  function clearData(dataset) {
+    map.eachLayer(function (layer) {
+      if (layer instanceof L.Marker && layer.options.dataset === dataset) {
+        map.removeLayer(layer);
+      }
+    });
+
+    // Remove the cleared dataset from the array
+    loadedDatasets.splice(loadedDatasets.findIndex(data => data.dataset === dataset), 1);
+  }
+
+  // Function to get the CSV file path based on the dataset name
+  function getCSVFilePath(dataset) {
+    // Define the mapping between dataset names and their corresponding CSV file paths
+    const datasetFilePaths = {
+      data1: './new_water_plants_info.csv',
+      data2: './hydrogen_cap_50.csv',
+      data3: './power.csv',
+      // Add more dataset names and file paths as needed
+    };
+
+    return datasetFilePaths[dataset];
+  }
+  // Function to load or clear polygons based on checkbox state
+  function toggleZone(zone) {
+  const checkbox = document.querySelector(`input[type="checkbox"][value="${zone}"]`);
+  if (!checkbox) return; // Check if the checkbox element exists
+  const isChecked = checkbox.checked;
+
+  if (isChecked) {
+    loadPolygon(zone);
+  } else {
+    clearPolygon(zone);
+  }
+}
+
+   // Load Polygon and Calculate Lot Size
+function loadPolygon(zone) {
+const csvFilePath = getCSVFilePathForZone(zone);
+if (!csvFilePath) return;
+
+Papa.parse(csvFilePath, {
+  header: true,
+  download: true,
+  skipEmptyLines: true,
+  complete: function (results) {
+    const data = results.data[0];
+    const latitudes = [];
+    const longitudes = [];
+
+    // Extract all latitude and longitude values from the CSV data
+    Object.keys(data).forEach(key => {
+      if (key.startsWith('lat')) {
+        latitudes.push(parseFloat(data[key]));
+      } else if (key.startsWith('lng')) {
+        longitudes.push(parseFloat(data[key]));
+      }
+    });
+
+    // Make sure the polygon's ring is closed (first and last points are the same)
+    latitudes.push(latitudes[0]);
+    longitudes.push(longitudes[0]);
+
+    // Create a polygon with the given coordinates and set the 'zone' attribute
+    const coordinates = [];
+    for (let i = 0; i < latitudes.length; i++) {
+      coordinates.push([latitudes[i], longitudes[i]]);
+    }
+
+    const polygon = L.polygon(coordinates, { zone: zone }).addTo(map);
+
+    const popupContentTemplate = (zone, area) => `
+    <div class="leaflet-popup-content-wrapper">
+    <b>Zone:</b> ${getZoneName(zone)}<br>
+    <b>Area:</b> ${area.toFixed(2)} square meters<br>
+    <button class="popup-button" onclick="showPictures('${zone}', 'powerPlant')">Power Demand</button>
+    <button class="popup-button" onclick="showPictures('${zone}', 'waterPlant')">Water Demand</button>
+
+  </div>
+`;
+
+function getZoneName(zone) {
+const zoneNames = {
+  zone1: 'Oshawa',
+    zone2: 'Whitby',
+    zone3: 'Ajax_Pickering',
+    zone4: 'L1B',
+    zone5: 'L9P',
+    zone6: 'L1C',
+    zone7: 'L9L',
+    zone8: 'L0K',
+    zone9: 'L0C_North',
+    zone10: 'L0C_South',
+    zone11: 'L0E',
+    zone12: 'L0B_North',
+    zone13: 'L0B_South',
+    
+  
+  // Add more zone names as needed
+};
+return zoneNames[zone] || zone; // Use the zone itself if no name is found
+}
+
+    // Calculate the geodesic area using turf.js
+    const turfPolygon = turf.polygon([coordinates]);
+    const area = turf.area(turfPolygon);
+
+    // Generate the popup content based on the zone and area, and set it to the polygon
+    const popupContent = popupContentTemplate(zone, area);
+    polygon.bindPopup(popupContent);
+  },
+});
+}
+
+
+function clearPolygon(zone) {
+  // Find the polygon layers based on the zone attribute and remove them
+  map.eachLayer(function (layer) {
+    if (layer instanceof L.Polygon && layer.options.zone === zone) {
+      map.removeLayer(layer);
+    }
+  });
+}
+
+
+
+
+
+ 
+// Function to get the CSV file path for the specified zone
+function getCSVFilePathForZone(zone) {
+  // Define the mapping between zones and their corresponding CSV file paths
+  const zoneFilePaths = {
+    zone1: './oshawa.csv',
+     zone2: './Whitby.csv',
+     zone3: './ajax.csv',
+     zone4: './L1B.csv',
+     zone5: './L9P.csv',
+     zone6: './L1C.csv',
+     zone7: './port.csv',
+     zone8: './L0k.csv',
+     zone9: './North2.csv',
+     zone10: './south2.csv',
+     zone11: './L0E.csv',
+     zone12: './L0B_North.csv',
+     zone13: './L0B_South.csv',
+    // Add more zones and file paths as needed
+  };
+
+  return zoneFilePaths[zone];
+}
+
+  // Function to reset the map view
+  function resetMapView() {
+    map.setView([43.8971, -78.8658], 10);
+  }
+ 
+  // Call the toggleZone function initially for any pre-checked checkboxes
+const zoneCheckboxes = document.querySelectorAll('input[type="checkbox"][value^="zone"]');
+zoneCheckboxes.forEach(checkbox => {
+  if (checkbox.checked) {
+    const zone = checkbox.value;
+    loadPolygon(zone);
+  }
+});
+
+
+</script>
+<!-- Your script -->
+<script>
+  
+  const zoneImages = {
+zone1: {
+  powerPlant: ['./Oshawa1output.png', './Oshawa2output.png'],
+  waterPlant: ['./Oshawa1outputw.png', './Oshawa2outputw.png'],
+},
+zone2: {
+  powerPlant: ['./Whitby1output.png', './Whitby2output.png'],
+  waterPlant: ['./Whitby1outputw.png', './Whitby2outputw.png'],
+},
+zone3: {
+  powerPlant: ['./ajax1output.png', './ajax2output.png'],
+  waterPlant: ['./ajax1outputw.png', './ajax2outputw.png'],
+},
+// Add more zone images for both plant types as needed
+};
+
+
+function showPictures(zone, plantType) {
+const images = zoneImages[zone][plantType];
+if (!images || images.length === 0) return;
+
+const imageElements = images.map(imagePath => `<img class="zone-image" src="${imagePath}" alt="Zone Image">`);
+const popupContent = `<div>${imageElements.join('')}</div>`;
+
+const popup = L.popup({
+  maxWidth: 500, // Set the maximum width of the popup
+})
+  .setLatLng(map.getCenter())
+  .setContent(popupContent)
+  .openOn(map);
+}
+
+
+  // ... (the rest of your script)
+</script>
+
+</body>
+</html>
