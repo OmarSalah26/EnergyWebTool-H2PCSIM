@@ -8,7 +8,7 @@ const H2PCSimTool = () => {
   const [selectedModule, setSelectedModule] = useState('PSM');
   const navigate = useNavigate();
 
-  const modules = ['PSM', 'ESN', 'Map', 'Etc'];
+  const modules = ['PSM', 'ESN', 'Map', 'Collaboration'];
 
   const handleModuleClick = (module) => {
     setSelectedModule(module);
@@ -25,8 +25,8 @@ const H2PCSimTool = () => {
       case 'Map':
         navigate('/map');
         break;
-      case 'Etc':
-        navigate('/etc');
+      case 'Collaboration':
+        navigate('/collab');
         break;
       default:
         break;
@@ -37,7 +37,7 @@ const H2PCSimTool = () => {
     PSM: 'Used to define the Energy Flow Diagrams for various physical models.',
     ESN: 'Used to visualize the Energy Semantic Network, and display all related components.',
     Map: 'Used to plot physical models across the region.',
-    Etc: 'Etc includes additional functionalities and tools.'
+    Collaboration: 'Used to handle inputs and outputs from the Hydrogen tools.'
   };
 
   return (
