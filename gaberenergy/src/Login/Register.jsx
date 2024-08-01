@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import H2PCSim from '/H2PCSS.png'; // Adjust the path as needed
 import { Link } from 'react-router-dom';
 
@@ -7,16 +8,23 @@ const Register = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [role, setRole] = useState('');
+    const [errorMessage, setErrorMessage] = useState(''); // Added error message state
+    const navigate = useNavigate(); // Get the navigate function
 
-    const handleRegister = (e) => {
+    const handleRegister = async (e) => {
         e.preventDefault();
-        axios.post('http://localhost:5000/api/register', { username, password, role })
-            .then(response => {
-                console.log('Response from server:', response.data);
-            })
-            .catch(error => {
-                console.error('Error sending data to server:', error);
-            });
+        try {
+            const response = await axios.post('http://localhost:5000/api/register', {
+                username,
+                password,
+                role});
+
+            console.log('Response from server:', response.data);
+            navigate('/'); // Redirect to login page after successful registration
+        } catch (error) {
+            console.error('Error sending data to server:', error.response ? error.response.data : error.message);
+            setErrorMessage('Registration failed. Please try again.');
+        }
     };
 
     return (
@@ -48,7 +56,6 @@ const Register = () => {
                                 <input
                                     type="text"
                                     id="username"
-                                    name="username"
                                     className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                                     placeholder="Username"
                                     value={username}
@@ -60,7 +67,6 @@ const Register = () => {
                                 <input
                                     type="password"
                                     id="password"
-                                    name="password"
                                     className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                                     placeholder="Password"
                                     value={password}
@@ -90,6 +96,7 @@ const Register = () => {
                             Register
                         </button>
                     </form>
+                    {errorMessage && <p className="mt-2 text-center text-sm text-red-600">{errorMessage}</p>}
                 </div>
             </div>
         </div>

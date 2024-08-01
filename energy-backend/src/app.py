@@ -14,7 +14,7 @@ app = Flask(__name__)
 username="root"
 password="12345"
 database_name="energy_project"
-app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{username}:{password}@localhost/{database_name}' #REPLACE 'root' with your username and 'password' with your password, and 'esnew' with the name of your database
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{username}:{password}@localhost:3000/{database_name}' #REPLACE 'root' with your username and 'password' with your password, and 'esnew' with the name of your database
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)

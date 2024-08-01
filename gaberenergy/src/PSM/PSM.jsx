@@ -122,14 +122,21 @@ function PSM() {
   
     const reactFlowBounds = event.target.getBoundingClientRect();
     const type = event.dataTransfer.getData('application/reactflow');
+  
+    const dropAreaWidth = reactFlowBounds.width;
+    const dropAreaHeight = reactFlowBounds.height;
+  
+    const centerX = dropAreaWidth / 2;
+    const centerY = dropAreaHeight / 2;
+  
     const position = {
-      x: event.clientX - reactFlowBounds.left,
-      y: event.clientY - reactFlowBounds.top,
+      x: centerX,
+      y: centerY,
     };
   
     let parameters = [];
     let category = '';
-
+  
     if (components.renewableEnergySources.elecGeneration.includes(type)) {
       category = 'renewableEnergySources.elecGeneration';
       parameters = parameterTemplates.energySources.renewableEnergySources.elecGeneration[type].map(({ name, type }) => ({ name, value: '', type, valid: true }));
@@ -177,6 +184,7 @@ function PSM() {
       category = 'organization';
     }
   
+    // Create the new node
     const newNode = {
       id: (nodes.length + 1).toString(),
       type: 'customNode',
@@ -185,8 +193,9 @@ function PSM() {
       style: { border: '1px solid #777', padding: '10px', borderRadius: '5px', backgroundColor: '#fff' },
     };
   
+    // Update the nodes state
     setNodes((nds) => nds.concat(newNode));
-  };
+  };  
 
   const onDragStart = (event, nodeType) => {
     event.dataTransfer.setData('application/reactflow', nodeType);
@@ -306,6 +315,29 @@ function PSM() {
     handleSaveModel();
     navigate('/esn');
   };
+
+  const handleDeleteParameter = (index) => {
+    console.log("Selected Node:", selectedNode);
+    console.log("Index to delete:", index);
+  
+    const updatedNodes = nodes.map((node) => {
+      if (node.id === selectedNode.id) {
+        const updatedParameters = [...node.data.parameters];
+        updatedParameters.splice(index, 1); 
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            parameters: updatedParameters,
+          },
+        };
+      }
+      return node;
+    });
+    console.log("Updated Nodes:", updatedNodes);
+    setNodes(updatedNodes);
+  };
+  
 
   const handleLocationInputChange = (e) => {
     const { name, value } = e.target;
@@ -480,6 +512,7 @@ function PSM() {
             </div>
           ))}
           <button onClick={handleCloseContextMenu}>Close</button>
+          <button onClick={() => handleDeleteParameter(index)}>Delete</button>
         </div>
       )}
 
