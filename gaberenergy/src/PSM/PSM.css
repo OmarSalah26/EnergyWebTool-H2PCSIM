@@ -95,9 +95,9 @@
 }
 
 .psm-context-menu {
-  position: fixed; /* Changed from absolute to fixed */
-  top: 50%; /* Center vertically */
-  left: 50%; /* Center horizontally */
+  position: fixed; 
+  top: 50%; 
+  left: 50%;
   transform: translate(40%, -50%);
   background: #fff;
   border: 1px solid #ddd;
@@ -108,8 +108,8 @@
   max-width: 300px;
   width: 100%;
   font-family: Arial, sans-serif;
-  max-height: 50vh; /* Added for vertical scrolling */
-  overflow-y: auto; /* Added for vertical scrolling */
+  max-height: 50vh;
+  overflow-y: auto; 
 }
 
 
