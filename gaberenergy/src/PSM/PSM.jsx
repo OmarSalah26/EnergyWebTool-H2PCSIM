@@ -193,7 +193,6 @@ function PSM() {
       style: { border: '1px solid #777', padding: '10px', borderRadius: '5px', backgroundColor: '#fff' },
     };
   
-    // Update the nodes state
     setNodes((nds) => nds.concat(newNode));
   };  
 
@@ -512,7 +511,6 @@ function PSM() {
             </div>
           ))}
           <button onClick={handleCloseContextMenu}>Close</button>
-          <button onClick={() => handleDeleteParameter(index)}>Delete</button>
         </div>
       )}
 
