@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Optimization</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input, textarea {
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin: 20px 0;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        #resultsTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        #resultsTable th, #resultsTable td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        #resultsTable th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .chart-container {
+            width: 80%;
+            margin: 50px auto;
+        }
+
+        #kpiResults {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .kpi-item {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h1>Energy Optimization Inputs</h1>
+
+    <!-- Input fields -->
+    <label for="pv_capacity">PV Capacity (kW)</label>
+    <input type="number" id="pv_capacity" placeholder="Enter PV Capacity (e.g., 5)">
+
+    <label for="wind_capacity">Wind Capacity (kW)</label>
+    <input type="number" id="wind_capacity" placeholder="Enter Wind Capacity (e.g., 3)">
+
+    <label for="fuel_cell_capacity">Fuel Cell Capacity (kW)</label>
+    <input type="number" id="fuel_cell_capacity" placeholder="Enter Fuel Cell Capacity (e.g., 2)">
+
+    <label for="pv_capital_cost">PV Capital Cost ($/kW)</label>
+    <input type="number" id="pv_capital_cost" placeholder="Enter PV Capital Cost (e.g., 2000)">
+
+    <label for="wind_capital_cost">Wind Capital Cost ($/kW)</label>
+    <input type="number" id="wind_capital_cost" placeholder="Enter Wind Capital Cost (e.g., 3000)">
+
+    <label for="fuel_cell_capital_cost">Fuel Cell Capital Cost ($/kW)</label>
+    <input type="number" id="fuel_cell_capital_cost" placeholder="Enter Fuel Cell Capital Cost (e.g., 1000)">
+
+    <label for="pv_om_cost">PV Maintenance Cost ($/kW/year)</label>
+    <input type="number" id="pv_om_cost" placeholder="Enter PV Maintenance Cost (e.g., 20)">
+
+    <label for="wind_om_cost">Wind Maintenance Cost ($/kW/year)</label>
+    <input type="number" id="wind_om_cost" placeholder="Enter Wind Maintenance Cost (e.g., 40)">
+
+    <label for="fuel_cell_om_cost">Fuel Cell Maintenance Cost ($/kWh)</label>
+    <input type="number" id="fuel_cell_om_cost" placeholder="Enter Fuel Cell Maintenance Cost (e.g., 0.02)">
+
+    <label for="pv_installation_cost">PV Installation Cost ($/kW)</label>
+    <input type="number" id="pv_installation_cost" placeholder="Enter PV Installation Cost (e.g., 500)">
+
+    <label for="wind_installation_cost">Wind Installation Cost ($/kW)</label>
+    <input type="number" id="wind_installation_cost" placeholder="Enter Wind Installation Cost (e.g., 1000)">
+
+    <label for="fuel_cell_installation_cost">Fuel Cell Installation Cost ($/kW)</label>
+    <input type="number" id="fuel_cell_installation_cost" placeholder="Enter Fuel Cell Installation Cost (e.g., 200)">
+
+    <label for="pv_lifetime">PV Lifetime (years)</label>
+    <input type="number" id="pv_lifetime" placeholder="Enter PV Lifetime (e.g., 25)">
+
+    <label for="wind_lifetime">Wind Lifetime (years)</label>
+    <input type="number" id="wind_lifetime" placeholder="Enter Wind Lifetime (e.g., 20)">
+
+    <label for="fuel_cell_lifetime">Fuel Cell Lifetime (years)</label>
+    <input type="number" id="fuel_cell_lifetime" placeholder="Enter Fuel Cell Lifetime (e.g., 10)">
+
+    <label for="hydrogen_price">Hydrogen Cost ($/kg)</label>
+    <input type="number" id="hydrogen_price" placeholder="Enter Hydrogen Cost (e.g., 3.0)">
+
+    <label for="surplus_energy_value">Surplus Energy Value ($/kWh)</label>
+    <input type="number" id="surplus_energy_value" placeholder="Enter Surplus Energy Value (e.g., 0.39)" step="0.01">
+
+    <label for="cost_grid">Cost Grid (same value for all 24 hours)</label>
+    <input type="number" id="cost_grid" placeholder="Enter the cost value for all hours (e.g., 63.1)">
+
+    <label for="emissions_grid">Emissions Grid (kg per kWh)</label>
+    <input type="number" id="emissions_grid" placeholder="Enter emissions grid (e.g., 0.025)" step="0.001">
+
+    <label for="discount_rate">Discount Rate (%)</label>
+    <input type="number" id="discount_rate" placeholder="Enter Discount Rate (e.g., 0.05)" step="0.01">
+
+    <button onclick="fetchResults()">Optimize Energy System</button>
+
+    <!-- Results Table -->
+    <table id="resultsTable" style="display: none;">
+        <thead>
+            <tr>
+                <th>Hour</th>
+                <th>Grid</th>
+                <th>PV</th>
+                <th>Wind</th>
+                <th>Fuel Cell Output</th>
+                <th>Surplus</th>
+                <th>Hydrogen Purchase</th>
+            </tr>
+        </thead>
+        <tbody id="resultsBody">
+            <!-- Results will be inserted here -->
+        </tbody>
+    </table>
+
+    <!-- KPI Results -->
+    <div id="kpiResults" style="display: none;">
+        <h2>KPI Performance</h2>
+        <div class="kpi-item" id="totalGridCost"></div>
+        <div class="kpi-item" id="totalPvCost"></div>
+        <div class="kpi-item" id="totalWindCost"></div>
+        <div class="kpi-item" id="totalFuelCellCost"></div>
+        <div class="kpi-item" id="totalHydrogenCost"></div>
+        <div class="kpi-item" id="totalSurplusValue"></div>
+        <div class="kpi-item" id="actualCostWithoutRenewable"></div>
+        <div class="kpi-item" id="totalCost"></div>
+        <div class="kpi-item" id="totalRevenue"></div>
+        <div class="kpi-item" id="electricityPrice"></div>
+        <div class="kpi-item" id="ghgEmissions"></div>
+        <div class="kpi-item" id="totalSurplus"></div>
+        <div class="kpi-item" id="totalGridPower"></div>
+        <div class="kpi-item" id="costReduction"></div>
+        <div class="kpi-item" id="emissionReduction"></div>
+        <div class="kpi-item" id="renewableFraction"></div>
+    </div>
+
+    <!-- Graph containers -->
+    <div class="chart-container">
+        <canvas id="energyProductionChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="surplusEnergyChart"></canvas>
+    </div>
+</div>
+
+<script>
+    function fetchResults() {
+        const pvCapacity = document.getElementById('pv_capacity').value;
+        const windCapacity = document.getElementById('wind_capacity').value;
+        const fuelCellCapacity = document.getElementById('fuel_cell_capacity').value;
+        const pvCapitalCost = document.getElementById('pv_capital_cost').value;
+        const windCapitalCost = document.getElementById('wind_capital_cost').value;
+        const fuelCellCapitalCost = document.getElementById('fuel_cell_capital_cost').value;
+        const pvInstallationCost = document.getElementById('pv_installation_cost').value;
+        const windInstallationCost = document.getElementById('wind_installation_cost').value;
+        const fuelCellInstallationCost = document.getElementById('fuel_cell_installation_cost').value;
+        const pvOmCost = document.getElementById('pv_om_cost').value;
+        const windOmCost = document.getElementById('wind_om_cost').value;
+        const fuelCellOmCost = document.getElementById('fuel_cell_om_cost').value;
+        const hydrogenPrice = document.getElementById('hydrogen_price').value;
+        const pvLifetime = document.getElementById('pv_lifetime').value;
+        const windLifetime = document.getElementById('wind_lifetime').value;
+        const fuelCellLifetime = document.getElementById('fuel_cell_lifetime').value;
+        const surplusEnergyValue = document.getElementById('surplus_energy_value').value;
+        const costGrid = document.getElementById('cost_grid').value;
+        const emissionsGrid = document.getElementById('emissions_grid').value;
+        const discountRate = document.getElementById('discount_rate').value;
+
+        const data = {
+            pv_capacity: parseFloat(pvCapacity),
+            wind_capacity: parseFloat(windCapacity),
+            fuel_cell_capacity: parseFloat(fuelCellCapacity),
+            pv_capital_cost: parseFloat(pvCapitalCost),
+            wind_capital_cost: parseFloat(windCapitalCost),
+            fuel_cell_capital_cost: parseFloat(fuelCellCapitalCost),
+            pv_installation_cost: parseFloat(pvInstallationCost),
+            wind_installation_cost: parseFloat(windInstallationCost),
+            fuel_cell_installation_cost: parseFloat(fuelCellInstallationCost),
+            pv_om_cost: parseFloat(pvOmCost),
+            wind_om_cost: parseFloat(windOmCost),
+            fuel_cell_om_cost: parseFloat(fuelCellOmCost),
+            hydrogen_price: parseFloat(hydrogenPrice),
+            pv_lifetime: parseFloat(pvLifetime),
+            wind_lifetime: parseFloat(windLifetime),
+            fuel_cell_lifetime: parseFloat(fuelCellLifetime),
+            surplus_energy_value: parseFloat(surplusEnergyValue),
+            cost_grid: parseFloat(costGrid),
+            emissions_grid: parseFloat(emissionsGrid),
+            discount_rate: parseFloat(discountRate),
+            electric_load: [1.07, 0.93, 0.8, 0.67, 0.67, 0.93, 1.33, 2.0, 2.4, 2.0, 1.6, 1.47, 
+                            1.6, 1.73, 1.87, 2.0, 2.4, 2.67, 2.93, 2.67, 2.4, 2.0, 1.6, 1.33],
+            hydrogen_energy_density: 33.33,
+            fuel_cell_efficiency: 0.6
+        };
+
+        fetch('/optimize', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            const { results, kpi } = data;
+            displayResults(results);
+            displayKpiResults(kpi);
+            plotEnergyProductionChart(results);
+            plotSurplusEnergyChart(results);
+        })
+        .catch(error => console.error('Error fetching the results:', error));
+    }
+
+    function displayResults(data) {
+        const resultsBody = document.getElementById('resultsBody');
+        const resultsTable = document.getElementById('resultsTable');
+        resultsBody.innerHTML = ''; // Clear previous results
+
+        data.forEach(result => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${result.Hour}</td>
+                <td>${result.Grid.toFixed(2)}</td>
+                <td>${result.PV.toFixed(2)}</td>
+                <td>${result.Wind.toFixed(2)}</td>
+                <td>${result.Fuel_Cell_Output.toFixed(2)}</td>
+                <td>${result.Surplus.toFixed(2)}</td>
+                <td>${result.Hydrogen_Purchase.toFixed(2)}</td>
+            `;
+            resultsBody.appendChild(row);
+        });
+
+        resultsTable.style.display = 'table';
+    }
+
+    function displayKpiResults(kpi) {
+        document.getElementById('totalGridCost').innerText = `Grid: $${kpi.total_grid_cost.toFixed(2)}`;
+        document.getElementById('totalPvCost').innerText = `PV (Daily): $${(kpi.total_pv_cost / 365).toFixed(2)}`;
+        document.getElementById('totalWindCost').innerText = `Wind (Daily): $${(kpi.total_wind_cost / 365).toFixed(2)}`;
+        document.getElementById('totalFuelCellCost').innerText = `Fuel Cell (Daily): $${(kpi.total_fuel_cell_cost / 365).toFixed(2)}`;
+        document.getElementById('totalHydrogenCost').innerText = `Hydrogen: $${kpi.total_hydrogen_cost.toFixed(2)}`;
+        document.getElementById('totalSurplusValue').innerText = `Surplus Energy Value: $${kpi.total_surplus_value.toFixed(2)}`;
+        document.getElementById('actualCostWithoutRenewable').innerText = `Actual cost of electricity from the grid per day without Renewable: $${kpi.actual_cost_without_renewable.toFixed(2)}`;
+        document.getElementById('totalCost').innerText = `Total Cost: $${kpi.total_cost.toFixed(2)}`;
+        document.getElementById('totalRevenue').innerText = `Total Revenue: $${kpi.total_revenue.toFixed(2)}`;
+        document.getElementById('electricityPrice').innerText = `Electricity Price: $${kpi.electricity_price.toFixed(2)} per kWh`;
+        document.getElementById('ghgEmissions').innerText = `GHG Emissions: ${kpi.ghg_emissions.toFixed(2)} kg CO2 per day`;
+        document.getElementById('totalSurplus').innerText = `Total Surplus Energy: ${kpi.total_surplus.toFixed(2)} kWh per day`;
+        document.getElementById('totalGridPower').innerText = `Total Grid Power After Optimization: ${kpi.total_grid_power.toFixed(2)} kWh per day`;
+        document.getElementById('costReduction').innerText = `Cost Reduction: ${(kpi.cost_reduction * 100).toFixed(2)}% (Target: 20%)`;
+        document.getElementById('emissionReduction').innerText = `Emission Reduction: ${(kpi.emission_reduction * 100).toFixed(2)}% (Target: 30%)`;
+        document.getElementById('renewableFraction').innerText = `Renewable Fraction: ${(kpi.renewable_fraction * 100).toFixed(2)}% (Target: 50%)`;
+        document.getElementById('kpiResults').style.display = 'block';
+    }
+
+    function plotEnergyProductionChart(data) {
+        const ctx = document.getElementById('energyProductionChart').getContext('2d');
+        const hours = data.map(item => `${item.Hour}:00`);
+        const gridData = data.map(item => item.Grid);
+        const pvData = data.map(item => item.PV);
+        const windData = data.map(item => item.Wind);
+        const fuelCellData = data.map(item => item.Fuel_Cell_Output);
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: hours,
+                datasets: [
+                    {
+                        label: 'Grid (kW)',
+                        data: gridData,
+                        borderColor: 'red',
+                        fill: false,
+                    },
+                    {
+                        label: 'Photovoltaic (kW)',
+                        data: pvData,
+                        borderColor: 'orange',
+                        fill: false,
+                    },
+                    {
+                        label: 'Wind (kW)',
+                        data: windData,
+                        borderColor: 'blue',
+                        fill: false,
+                    },
+                    {
+                        label: 'Fuel Cell (kW)',
+                        data: fuelCellData,
+                        borderColor: 'green',
+                        fill: false,
+                    }
+                ]
+            }
+        });
+    }
+
+    function plotSurplusEnergyChart(data) {
+        const ctx = document.getElementById('surplusEnergyChart').getContext('2d');
+        const hours = data.map(item => `${item.Hour}:00`);
+        const surplusData = data.map(item => item.Surplus);
+        const hydrogenPurchaseData = data.map(item => item.Hydrogen_Purchase);
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: hours,
+                datasets: [
+                    {
+                        label: 'Surplus (kW)',
+                        data: surplusData,
+                        borderColor: 'green',
+                        fill: false,
+                    },
+                    {
+                        label: 'Hydrogen Purchase (kg)',
+                        data: hydrogenPurchaseData,
+                        borderColor: 'blue',
+                        fill: false,
+                    }
+                ]
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

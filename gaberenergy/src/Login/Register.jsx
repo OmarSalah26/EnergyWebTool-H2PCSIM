@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import H2PCSim from '/H2PCSS.png'; // Adjust the path as needed
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Register = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [role, setRole] = useState('');
+    const navigate = useNavigate();
+
 
     const handleRegister = (e) => {
         e.preventDefault();
         axios.post('http://localhost:5000/api/register', { username, password, role })
             .then(response => {
                 console.log('Response from server:', response.data);
+                navigate('/');
             })
             .catch(error => {
                 console.error('Error sending data to server:', error);

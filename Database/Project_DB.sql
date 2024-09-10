@@ -595,11 +595,13 @@ CREATE TABLE WindFarm_WindTurbine (
 
 CREATE TABLE WindTurbine_KPI (
     WindTurbine_id INT,
-    kpi_id VARCHAR(255),
+    kpi_id INT,
     PRIMARY KEY (WindTurbine_id, kpi_id),
     FOREIGN KEY (WindTurbine_id) REFERENCES WindTurbine   (id),
     FOREIGN KEY (kpi_id) REFERENCES KPI(id)
 );
+
+
 
 CREATE TABLE WindFarm_KPI (
     WindFarm_id INT,

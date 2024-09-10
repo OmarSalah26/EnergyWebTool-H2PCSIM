@@ -33,6 +33,39 @@ class Site(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     location_id = db.Column(db.Integer, db.ForeignKey('geolocation.id'))
 
+class New_Site(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(255))
+    site_type = db.Column(db.String(255))
+    demand = db.Column(db.Numeric(10, 2))
+    daily_consumption = db.Column(db.Numeric(10, 2))
+    surplus = db.Column(db.Numeric(10, 2))
+    number_of_occupants = db.Column(db.Integer)
+    size = db.Column(db.Numeric(10, 2))
+    location = db.Column(db.String(255))
+    
+    # Foreign keys for User and GeoLocation
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    location_id = db.Column(db.Integer, db.ForeignKey('geolocation.id'))
+
+    # Foreign keys for energy sources
+    pv_array_id = db.Column(db.Integer, db.ForeignKey('pv_array.id'))
+    wind_turbine_id = db.Column(db.Integer, db.ForeignKey('wind_turbine.id'))
+    hydrogen_fuel_cell_id = db.Column(db.Integer, db.ForeignKey('hydrogen_fuel_cell.id'))
+    biomass_id = db.Column(db.Integer, db.ForeignKey('biomass.id'))
+    geothermal_id = db.Column(db.Integer, db.ForeignKey('geo_thermal.id'))
+    hydropower_id = db.Column(db.Integer, db.ForeignKey('hydropower.id'))
+    electric_battery_id = db.Column(db.Integer, db.ForeignKey('electric_battery.id'))
+    flywheel_energy_storage_id = db.Column(db.Integer, db.ForeignKey('flywheel_energy_storage.id'))
+    hydrogen_energy_storage_id = db.Column(db.Integer, db.ForeignKey('hydrogen_energy_storage.id'))
+    thermal_battery_id = db.Column(db.Integer, db.ForeignKey('thermal_battery.id'))
+    combined_heat_power_id = db.Column(db.Integer, db.ForeignKey('combined_heat_power.id'))
+    generator_id = db.Column(db.Integer, db.ForeignKey('generator.id'))
+    steam_methane_reformer_id = db.Column(db.Integer, db.ForeignKey('steam_methane_reformer.id'))
+    hydrogen_based_cphs_id = db.Column(db.Integer, db.ForeignKey('hydrogen_based_cphs.id'))
+    water_treatment_plant_id = db.Column(db.Integer, db.ForeignKey('water_treatment_plant.id'))
+    power_plant_id = db.Column(db.Integer, db.ForeignKey('power_plant.id'))
+
 class Load(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(255))
@@ -53,7 +86,7 @@ class Utility(db.Model):
     capacity = db.Column(db.Numeric(10, 2))
     tier = db.Column(db.String(255))
     site_id = db.Column(db.Integer, db.ForeignKey('site.id'))
-    location_id = db.Column(db.Integer, db.ForeignKey('geo_location.id'))
+    location_id = db.Column(db.Integer, db.ForeignKey('geolocation.id'))
 
 class Organization(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -66,6 +99,7 @@ class SiteOrganization(db.Model):
     organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), primary_key=True)
 
 class HydrogenFuelCell(db.Model):
+    __tablename__ = 'hydrogen_fuel_cell'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(255))
     capacity = db.Column(db.Numeric(10, 2))
