@@ -22,7 +22,7 @@ password="12345"
 database_name="energy_project"
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{username}:{password}@localhost/{database_name}' #REPLACE 'root' with your username and 'password' with your password, and 'esnew' with the name of your database
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
+LCOE=0
 
 db.init_app(app)
 CORS(app) # Enable CORS for all routes by default
@@ -97,28 +97,6 @@ import logging
 
 logging.basicConfig(level=logging.WARNING)
 
-@app.route('/RunMGOP', methods=['GET'])
-def Run_MG_OpTimizer():
-
-    
-
-
-    try:
-        # Your optimization logic here
-        params = define_parameters_durham_home()
-        
-        ####################################################### Passing the data to MG Optimizer######################################################################
-        prob, energy_grid, energy_pv, energy_wind, surplus_energy = create_optimization_model(params)
-        results_df, kpi_data = solve_and_print_results(prob, energy_grid, energy_pv, energy_wind, surplus_energy, params)
-            
-        # Return the result as JSON, without logging additional details to the console
-        return jsonify({'message': 'MG Optimizer Run successfully', 'results_df': results_df}), 200
-    except Exception as e:
-        logging.error(f"Error occurred: {e}")
-        return jsonify({'message': 'An error occurred'}), 500
- 
-    # Return the site data as JSON
-    return jsonify({'message': 'MG Optimizer Run successfully', 'results_df': results_df}), 200
 
 
 def create_energy_variables(prefix, hours):
@@ -234,6 +212,181 @@ def solve_and_print_results(prob, energy_grid, energy_pv, energy_wind, surplus_e
     results_json = df.to_dict(orient='records')
 
     return results_json, kpi_data
+
+
+
+@app.route('/RunMGOP', methods=['GET'])
+def Run_MG_OpTimizer():
+
+    user_id = request.args.get('user_id') 
+
+
+    try:
+        # Your optimization logic here
+        #params = define_parameters_durham_home()
+        
+        ####################################################### Passing the data to MG Optimizer######################################################################
+        #prob, energy_grid, energy_pv, energy_wind, surplus_energy = create_optimization_model(params)
+        #results_df, kpi_data = solve_and_print_results(prob, energy_grid, energy_pv, energy_wind, surplus_energy, params)
+
+        # Your optimization logic here use the db data
+        data=get_sites_with_id(id =user_id)
+        print("#########################################################################################################")
+        print(f"############### {LCOE} ################")
+        print("#########################################################################################################")
+
+        params = {
+        'capacity_wind': [0.25, 0.23, 0.2, 0.18, 0.15, 0.13, 0.1, 0.12, 0.15, 0.2,
+                          0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.48, 0.45, 0.4, 0.35, 0.3, 0.28, 0.27, 0.26],
+        'capacity_pv': [0, 0, 0, 0, 0, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6,
+                        0.65, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.05, 0, 0, 0, 0],
+        ######################################################################################################
+        ######################################################################################################
+        ######################################################################################################
+        
+        'cost_grid': [ LCOE * 100  ] * 24, ########### Enter the Elec Price per KWh ############
+
+        ######################################################################################################
+        ######################################################################################################
+        ######################################################################################################
+        
+        'emissions_grid': 0.025, # kg per kw
+        'electric_load': [0.8, 0.7, 0.6, 0.5, 0.5, 0.7, 1.0, 1.5, 1.8, 1.5, 1.2, 1.1, 
+                          1.2, 1.3, 1.4, 1.5, 1.8, 2.0, 2.2, 2.0, 1.8, 1.5, 1.2, 1.0], # the total demand is 30
+        
+        # System capacities
+        'pv_capacity': data[0]["energy_sources"]['pv_array']["capacity"],  # kW
+        'wind_capacity': data[0]["energy_sources"]['wind_turbine']["capacity"],  # kW
+        
+        # PV System Costs
+        'pv_capital_cost': data[0]["energy_sources"]['pv_array']["Capital_cost"],  # $/kW
+        # 'pv_replacement_cost': 1500,  # $/kW
+        'pv_installation_cost': data[0]["energy_sources"]['pv_array']["Installation_cost"],
+        'pv_om_cost': data[0]["energy_sources"]['pv_array']["Operation_Maintenance_cost"],  # $/kW/year
+        'pv_lifetime': data[0]["energy_sources"]['pv_array']["lifespan"],  # years
+        
+        # Wind Turbine Costs
+        'wind_capital_cost': data[0]["energy_sources"]['wind_turbine']["Capital_cost"],  # $/kW
+        # 'wind_replacement_cost': 2500,  # $/kW
+        'wind_installation_cost': data[0]["energy_sources"]['wind_turbine']["Installation_cost"],  # $/kW
+        'wind_om_cost': data[0]["energy_sources"]['wind_turbine']["Operation_Maintenance_cost"],  # $/kW/year
+        'wind_lifetime': data[0]["energy_sources"]['wind_turbine']["lifespan"],  # years
+        
+
+        
+        # Grid Connection Costs
+        # 'grid_connection_cost': 1000,  # $ (one-time fee)
+        'grid_fixed_charge': 25,  # $/month
+        
+        # Other parameters
+        'project_lifetime': 25,  # years
+        'discount_rate': 0.05,  # 5% annual discount rate
+        
+        # Targets (unchanged)
+        'cost_reduction_target': 0.2,
+        'emission_reduction_target': 0.3,
+        'renewable_fraction_target': 0.5,
+        
+        'surplus_energy_value': 0.39,  # $/kWh, assuming a feed-in tariff or net metering rate
+    }
+        
+        ####################################################### Passing the data to MG Optimizer######################################################################
+        prob, energy_grid, energy_pv, energy_wind, surplus_energy = create_optimization_model(params)
+        results_df, kpi_data = solve_and_print_results(prob, energy_grid, energy_pv, energy_wind, surplus_energy, params)
+        if not kpi_data:
+            print("Warning: KPI data was not generated correctly")
+
+        return jsonify({'message': 'MG Optimizer Run successfully', 'results_df': results_df, 'kpi_data': kpi_data}), 200 
+        # Return the result as JSON, without logging additional details to the console
+    except Exception as e:
+        logging.error(f"Error occurred: {e}")
+        return jsonify({'message': 'An error occurred'}), 500
+ 
+def get_sites_with_id(id =10):
+    
+    # Retrieve all sites associated with the given user ID
+    sites = New_Site.query.filter_by(user_id=id).all()
+
+    # If no sites are found, return an empty list
+    if not sites:
+        return jsonify({'message': 'No sites found for the user', 'sites': []}), 404
+
+    # Convert the site objects to a list of dictionaries for easy JSON conversion
+    sites_data = []
+    for site in sites:
+        # Only include non-null energy sources and join with their full data
+        energy_sources = {}
+
+        if site.pv_array_id:
+            pv_array = PVArray.query.get(site.pv_array_id)
+            energy_sources['pv_array'] = {
+                'id': pv_array.id,
+                'name': pv_array.name,
+                'rated_power': str(pv_array.rated_power),
+                'efficiency': str(pv_array.efficiency),
+                'area': str(pv_array.area),
+                'module': pv_array.module,
+                'description': pv_array.description,
+                'location': pv_array.location,
+                'capacity':float(pv_array.capacity),
+                'lifespan': pv_array.lifespan,
+                'Installation_cost': float(pv_array.operational_cost),
+                'Capital_cost': float(pv_array.installation_cost),
+                'Operation_Maintenance_cost': float(pv_array.maintenance_cost)
+            }
+
+        if site.wind_turbine_id:
+            wind_turbine = WindTurbine.query.get(site.wind_turbine_id)
+            energy_sources['wind_turbine'] = {
+                'id': wind_turbine.id,
+                'name': wind_turbine.name,
+                
+                'hub_height': str(wind_turbine.hub_height),
+                'rotor_diameter': str(wind_turbine.rotor_diameter),
+                'turbine_model': wind_turbine.turbine_model,
+                'description': wind_turbine.description,
+                'location': wind_turbine.location,
+                'capacity': 5, #float(wind_turbine.capacity),
+                'lifespan': wind_turbine.lifespan,
+                'Installation_cost': float(wind_turbine.operational_cost),
+                'Capital_cost': float(wind_turbine.installation_cost),
+                'Operation_Maintenance_cost': float(wind_turbine.maintenance_cost)
+            }
+
+        if site.hydrogen_fuel_cell_id:
+            hydrogen_fuel_cell = HydrogenFuelCell.query.get(site.hydrogen_fuel_cell_id)
+            energy_sources['hydrogen_fuel_cell'] = {
+                'id': hydrogen_fuel_cell.id,
+                'name': hydrogen_fuel_cell.name,
+                
+                'efficiency': str(hydrogen_fuel_cell.efficiency),
+                'lifespan': hydrogen_fuel_cell.lifespan,
+                'description': hydrogen_fuel_cell.description,
+                'location': hydrogen_fuel_cell.location,
+                'Capactiy':float(hydrogen_fuel_cell.capacity),
+                'Installation_cost': float(hydrogen_fuel_cell.operational_cost),
+                'Capital_cost': float(hydrogen_fuel_cell.installation_cost),
+                'Operation_Maintenance_cost': float(hydrogen_fuel_cell.maintenance_cost)
+            }
+
+
+        site_data = {
+            'id': site.id,
+            'name': site.name,
+            'site_type': site.site_type,
+            'demand': str(site.demand),
+            'daily_consumption': str(site.daily_consumption),
+            'surplus': str(site.surplus),
+            'number_of_occupants': site.number_of_occupants,
+            'size': str(site.size),
+            'location': site.location,
+            'energy_sources': energy_sources  # Include non-null energy sources with their full data
+        }
+
+        sites_data.append(site_data)
+
+    # Return the site data as JSON
+    return  sites_data
 
 
 ######################################################################################################################
@@ -375,7 +528,7 @@ def Old_retrieve_user_data():
 
 @app.route('/retrieve', methods=['GET'])
 def get_sites():
-    user_id = request.args.get('user_id')
+    user_id = request.args.get('user_id') 
     # Retrieve all sites associated with the given user ID
     sites = New_Site.query.filter_by(user_id=user_id).all()
 
@@ -1623,6 +1776,7 @@ def get_data():
 
     return send_file(io.BytesIO(output.getvalue().encode()), mimetype='text/csv', as_attachment=True, download_name='all_data.csv')
 
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
@@ -1667,6 +1821,8 @@ def get_lcoe():
 
         for k, i in enumerate(df['Cost/Operating cost ($/yr)']):
             if i >= 1:
+                global LCOE
+                LCOE=df['Cost/LCOE ($/kWh)'][k]
                 return jsonify({"LCOE": df['Cost/LCOE ($/kWh)'][k]})
         
         return jsonify({"message": "No valid LCOE found"}), 404
